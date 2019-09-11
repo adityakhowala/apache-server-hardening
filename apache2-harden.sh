@@ -5,7 +5,7 @@
 # https://www.tecmint.com/apache-security-tips/
 
 CONFIG_FILE="/etc/apache2/apache2.conf"
-MOD_FILE="/etc/apache2/mods-available"
+MOD_DIR="/etc/apache2/mods-available"
 
 echo " ------------------------------- "
 echo "     Apache2 Server Hardening    "
@@ -22,6 +22,8 @@ echo -e "\nPerforming These Checklist
 8. System Settings Protection
 9. Enable XSS Protection
 10. Disable HTTP 1.0 Protocol
+11. Limit Request Size
+12. Timeout value configuration
      "
 
 ## Hide Apache Version and OS Identity from Errors
@@ -59,6 +61,18 @@ fi
 
 ## Disable SSL v2 & v3
 
-sed -i 's/^\tSSLProtocol.*/\tSSLProtocol –ALL +TLSv1.2/' $MOD_FILE/ssl.conf 
+if [[ -f $MOD_DIR/ssl.conf ]]
+then
+sed -i 's/^\tSSLProtocol.*/\tSSLProtocol –ALL +TLSv1.2/' $MOD_DIR/ssl.conf 
+fi
+
+## Disable Null and Weak Ciphers 
+
+if [[ -f $MOD_DIR/ssl.conf ]]
+then
+sed -i 's|^\tSSLCipherSuite.*|\tSSLCipherSuite ALL:!aNULL:!ADH:!eNULL:!LOW:!EXP:RC4+RSA:+HIGH:+MEDIUM|' $MOD_DIR/ssl.conf 
+fi
+
+##
 
 systemctl restart apache2
