@@ -5,7 +5,7 @@
 # https://www.tecmint.com/apache-security-tips/
 
 CONFIG_FILE="/etc/apache2/apache2.conf"
-
+MOD_FILE="/etc/apache2/mods-available"
 
 echo " ------------------------------- "
 echo "     Apache2 Server Hardening    "
@@ -24,7 +24,7 @@ echo -e "\nPerforming These Checklist
 10. Disable HTTP 1.0 Protocol
      "
 
-# Hide Apache Version and OS Identity from Errors
+## Hide Apache Version and OS Identity from Errors
 
 value=$( egrep -i "ServerTokens Prod" $CONFIG_FILE )
 if [[ $? -eq 1 ]]
@@ -47,7 +47,7 @@ then
 fi
 
 
-# Disable directory browser listing
+## Disable directory browser listing
 
 CATCH=$( egrep -i "options.*-indexes" $CONFIG_FILE )
 
@@ -57,5 +57,8 @@ sed -i "s|^\tOptions.*Indexes.*|&\n\tOptions -Indexes|" $CONFIG_FILE
 fi
 
 
+## Disable SSL v2 & v3
+
+sed -i 's/^\tSSLProtocol.*/\tSSLProtocol –ALL +TLSv1.2/' $MOD_FILE/ssl.conf 
 
 systemctl restart apache2
