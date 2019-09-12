@@ -55,7 +55,7 @@ CATCH=$( egrep -i "options.*-indexes" $CONFIG_FILE )
 
 if [[ $? -eq 1 ]]
 then
-sed -i "s|^\tOptions.*Indexes.*|&\n\tOptions -Indexes|" $CONFIG_FILE
+	sed -i "s|^\tOptions.*Indexes.*|&\n\tOptions -Indexes|" $CONFIG_FILE
 fi
 
 
@@ -63,16 +63,28 @@ fi
 
 if [[ -f $MOD_DIR/ssl.conf ]]
 then
-sed -i 's/^\tSSLProtocol.*/\tSSLProtocol –ALL +TLSv1.2/' $MOD_DIR/ssl.conf 
+	sed -i 's/^\tSSLProtocol.*/\tSSLProtocol –ALL +TLSv1.2/' $MOD_DIR/ssl.conf 
 fi
 
 ## Disable Null and Weak Ciphers 
 
 if [[ -f $MOD_DIR/ssl.conf ]]
 then
-sed -i 's|^\tSSLCipherSuite.*|\tSSLCipherSuite ALL:!aNULL:!ADH:!eNULL:!LOW:!EXP:RC4+RSA:+HIGH:+MEDIUM|' $MOD_DIR/ssl.conf 
+	sed -i 's|^\tSSLCipherSuite.*|\tSSLCipherSuite ALL:!aNULL:!ADH:!eNULL:!LOW:!EXP:RC4+RSA:+HIGH:+MEDIUM|' $MOD_DIR/ssl.conf 
 fi
 
-##
+## Disable Trace HTTP Request
+
+echo "TraceEnable off" >> $CONFIG_FILE
+
+
+## Disable Risky Http Methods
+
+echo "<LimitExcept GET POST HEAD>" >> $CONFIG_FILE
+echo "deny from all" >> $CONFIG_FILE
+echo "</LimitExcept>" >> $CONFIG_FILE
+
+## 
+ 
 
 systemctl restart apache2
